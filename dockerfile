@@ -1,20 +1,20 @@
-# Usa una imagen oficial de Node.js como base
+# Base de Node.js
 FROM node:18
 
-# Setea el directorio de trabajo
-WORKDIR /usr/src/app
+# Configurar directorio de trabajo
+WORKDIR /app
 
-# Copia los archivos de configuración
+# Copiar archivos de dependencias
 COPY package*.json ./
 
-# Instala las dependencias
+# Instalar dependencias
 RUN npm install
 
-# Copia el código fuente del backend
+# Copiar el resto del código fuente
 COPY . .
 
-# Exponer el puerto que el backend va a utilizar (Ejemplo: 3000)
+# Exponer el puerto que usa la app
 EXPOSE 3000
 
-# Comando para ejecutar la app de Node.js
+# Comando para iniciar la app
 CMD ["npm", "start"]
