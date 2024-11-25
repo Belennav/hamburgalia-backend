@@ -1,66 +1,91 @@
-import {
-  AngularNodeAppEngine,
-  createNodeRequestHandler,
-  isMainModule,
-  writeResponseToNodeResponse,
-} from '@angular/ssr/node';
-import express from 'express';
-import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+/**
+ * Setup express server.
+ */
 
-const serverDistFolder = dirname(fileURLToPath(import.meta.url));
-const browserDistFolder = resolve(serverDistFolder, '../browser');
+import cookieParser from 'cookie-parser';
+import morgan from 'morgan';
+import path from 'path';
+import helmet from 'helmet';
+import express, { Request, Response, NextFunction } from 'express';
+import logger from 'jet-logger';
+
+import 'express-async-errors';
+
+import BaseRouter from '@src/routes';
+
+import Paths from '@src/common/Paths';
+import EnvVars from '@src/common/EnvVars';
+import HttpStatusCodes from '@src/common/HttpStatusCodes';
+import { NodeEnvs } from '@src/common/misc';
+import { RouteError } from '@src/common/classes';
+import { IReq, IRes } from './routes/common/types';
+
+
+// **** Variables **** //
 
 const app = express();
-const angularApp = new AngularNodeAppEngine();
 
-/**
- * Example Express Rest API endpoints can be defined here.
- * Uncomment and define endpoints as necessary.
- *
- * Example:
- * ```ts
- * app.get('/api/**', (req, res) => {
- *   // Handle API request
- * });
- * ```
- */
 
-/**
- * Serve static files from /browser
- */
-app.use(
-  express.static(browserDistFolder, {
-    maxAge: '1y',
-    index: false,
-    redirect: false,
-  }),
-);
+// **** Setup **** //
 
-/**
- * Handle all other requests by rendering the Angular application.
- */
-app.use('/**', (req, res, next) => {
-  angularApp
-    .handle(req)
-    .then((response) =>
-      response ? writeResponseToNodeResponse(response, res) : next(),
-    )
-    .catch(next);
-});
+// Basic middleware
+app.use(express.json());
+app.use(express.urlencoded({extended: true}));
+app.use(cookieParser(EnvVars.CookieProps.Secret));
 
-/**
- * Start the server if this module is the main entry point.
- * The server listens on the port defined by the `PORT` environment variable, or defaults to 4000.
- */
-if (isMainModule(import.meta.url)) {
-  const port = process.env['PORT'] || 4000;
-  app.listen(port, () => {
-    console.log(`Node Express server listening on http://localhost:${port}`);
-  });
+// Show routes called in console during development
+if (EnvVars.NodeEnv === NodeEnvs.Dev.valueOf()) {
+  app.use(morgan('dev'));
 }
 
-/**
- * The request handler used by the Angular CLI (dev-server and during build).
- */
-export const reqHandler = createNodeRequestHandler(app);
+// Security
+if (EnvVars.NodeEnv === NodeEnvs.Production.valueOf()) {
+  app.use(helmet());
+}
+
+// Add APIs, must be after middleware
+app.use(Paths.Base, BaseRouter);
+
+// Add error handler
+app.use((err: Error, _: Request, res: Response, next: NextFunction) => {
+  if (EnvVars.NodeEnv !== NodeEnvs.Test.valueOf()) {
+    logger.err(err, true);
+  }
+  let status = HttpStatusCodes.BAD_REQUEST;
+  if (err instanceof RouteError) {
+    status = err.status;
+    res.status(status).json({ error: err.message });
+  }
+  return next(err);
+});
+
+
+// ** Front-End Content ** //
+
+// Set views directory (html)
+const viewsDir = path.join(__dirname, 'views');
+app.set('views', viewsDir);
+
+// Set static directory (js and css).
+const staticDir = path.join(__dirname, 'public');
+app.use(express.static(staticDir));
+
+// Nav to login pg by default
+app.get('/', (_: Request, res: Response) => {
+  res.sendFile('login.html', { root: viewsDir });
+});
+
+// Redirect to login if not logged in.
+app.get('/users', (req: IReq, res: IRes) => {
+  const jwt = req.signedCookies[EnvVars.CookieProps.Key];
+  if (!jwt) {
+    res.redirect('/');
+  } else {
+    res.sendFile('users.html', {root: viewsDir});
+  }
+});
+
+
+// **** Export default **** //
+
+export default app;
