@@ -6,8 +6,30 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const { connectDB, getDb } = require('./db');
 
-const app = express();
 const port = 3000;
+// server.js
+const express = require('express');
+const Sentry = require('@sentry/node');
+const app = express();  // Única declaración de `app`
+
+// Configura Sentry
+Sentry.init({ dsn: 'https://your-sentry-dsn@sentry.io/123456' });
+
+// Habilita el middleware de Sentry
+app.use(Sentry.Handlers.requestHandler());
+
+// Rutas
+app.get('/', function mainHandler(req, res) {
+  res.send('Hello, world!');
+});
+
+// Error handler de Sentry
+app.use(Sentry.Handlers.errorHandler());
+
+// Puerto
+app.listen(3000, () => {
+  console.log('Server running on port 3000');
+});
 
 // Middleware
 app.use(cors());
