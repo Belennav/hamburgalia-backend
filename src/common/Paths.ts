@@ -4,17 +4,21 @@
 
 
 export default {
-  Base: '/api',
-  Auth: {
-    Base: '/auth',
-    Login: '/login',
-    Logout: '/logout',
-  },
+  Base: "/api",
   Users: {
-    Base: '/users',
-    Get: '/all',
-    Add: '/add',
-    Update: '/update',
-    Delete: '/delete/:id',
+    Base: "/users",
+    Get: "/",
+    Add: "/",
+    Login: "/login",
+    Update: "/",
+    Delete: "/:id",
+  },
+  Hamburguesas: {
+    Base: "/hamburguesas",
+    Get: "/",
+    Add: "/",
+    Update: "/",
+    Delete: "/:id",
+    GetAllByCreatorId: "/creator/:creatorId",
   },
 } as const;
