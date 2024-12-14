@@ -1,15 +1,79 @@
-// models/hamburguesa.js
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
+// **** Variables **** //
 
-const hamburguesaSchema = new mongoose.Schema({
-  nombre: { type: String, required: true },
-  descripcion: String,
-  pan: String,
-  proteina: String,
-  ingredientes: [String],
-  disenos: String,
-  puntuacion: { type: Number, default: 0 },
-  comentarios: [{ type: String }]
-});
+const INVALID_CONSTRUCTOR_PARAM =
+  "nameOrObj arg must a string or an object " +
+  "with the appropriate user keys.";
+// **** Types **** //
 
-module.exports = mongoose.model('Hamburguesa', hamburguesaSchema);
+export interface IHamburguesa {
+  _id?: mongoose.Types.ObjectId;
+  nombre: string;
+  ingredientes: Array<Ingrediente>;
+  creatorId: mongoose.Types.ObjectId;
+}
+// **** Functions **** //
+
+/**
+ * Create new User.
+ */
+function new_(
+  nombre?: string,
+  ingredientes?: Array<Ingrediente>,
+  _id?: string // id last cause usually set by db
+): IHamburguesa{
+  return {
+    _id: _id ? new mongoose.Types.ObjectId(`${_id}`) : undefined,
+    nombre: nombre ?? "",
+    ingredientes: ingredientes ? ingredientes : [],
+    creatorId: new mongoose.Types.ObjectId(),
+  };
+}
+
+/**
+ * Get user instance from object.
+ */
+function from(param: object): IHamburguesa{
+  if (!isHamburguesa(param)) {
+    throw new Error(INVALID_CONSTRUCTOR_PARAM);
+  }
+  const p = param as IHamburguesa;
+  return new_(p.nombre, p.ingredientes, p._id?.toString());
+}
+
+/**
+ * See if the param meets criteria to be a user.
+ */
+function isHamburguesa(arg: unknown): boolean {
+  return (
+    !!arg &&
+    typeof arg === "object" &&
+    ("_id" in arg ? typeof (arg as IHamburguesa)._id === "string" : true) &&
+    "nombre" in arg &&
+    typeof (arg as IHamburguesa).nombre === "string" &&
+    "ingredientes" in arg &&
+    Array.isArray((arg as IHamburguesa).ingredientes) &&
+    // Verificar que todos los ingredientes son válidos según el enum
+    (arg as IHamburguesa).ingredientes.every((ing: Ingrediente) =>
+      Object.values(Ingrediente).includes(ing)
+    ) &&
+    "creatorId" in arg && // creatorId is a mongoose.Types.ObjectId or string
+    (typeof (arg as IHamburguesa).creatorId === "string" ||
+      (arg as IHamburguesa).creatorId instanceof mongoose.Types.ObjectId)
+  );
+}
+
+export enum Ingrediente {
+  QUESO = "queso",
+  TOMATE = "tomate",
+  LECHUGA = "lechuga",
+  SALSA = "salsa",
+}
+
+// **** Export default **** //
+
+export default {
+  new: new_,
+  from,
+  isHamburguesa,
+} as const;
