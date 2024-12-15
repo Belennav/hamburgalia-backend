@@ -16,9 +16,9 @@ import BaseRouter from '@src/routes';
 import Paths from '@src/common/Paths';
 import EnvVars from '@src/common/EnvVars';
 import HttpStatusCodes from '@src/common/HttpStatusCodes';
+import RouteError from '@src/common/RouteError';
 import { NodeEnvs } from '@src/common/misc';
-import { RouteError } from '@src/common/classes';
-import { IReq, IRes } from './routes/common/types';
+import cors from 'cors';
 
 
 // **** Variables **** //
@@ -32,6 +32,10 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(cookieParser(EnvVars.CookieProps.Secret));
+
+//Cors default
+app.use(cors());
+
 
 // Show routes called in console during development
 if (EnvVars.NodeEnv === NodeEnvs.Dev.valueOf()) {
@@ -47,20 +51,25 @@ if (EnvVars.NodeEnv === NodeEnvs.Production.valueOf()) {
 app.use(Paths.Base, BaseRouter);
 
 // Add error handler
-app.use((err: Error, _: Request, res: Response, next: NextFunction) => {
+app.use((
+  err: Error,
+  _: Request,
+  res: Response,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  next: NextFunction,
+) => {
   if (EnvVars.NodeEnv !== NodeEnvs.Test.valueOf()) {
     logger.err(err, true);
   }
   let status = HttpStatusCodes.BAD_REQUEST;
   if (err instanceof RouteError) {
     status = err.status;
-    res.status(status).json({ error: err.message });
   }
-  return next(err);
+  return res.status(status).json({ error: err.message });
 });
 
 
-// ** Front-End Content ** //
+// **** Front-End Content **** //
 
 // Set views directory (html)
 const viewsDir = path.join(__dirname, 'views');
@@ -70,19 +79,14 @@ app.set('views', viewsDir);
 const staticDir = path.join(__dirname, 'public');
 app.use(express.static(staticDir));
 
-// Nav to login pg by default
+// Nav to users pg by default
 app.get('/', (_: Request, res: Response) => {
-  res.sendFile('login.html', { root: viewsDir });
+  return res.redirect('/users');
 });
 
 // Redirect to login if not logged in.
-app.get('/users', (req: IReq, res: IRes) => {
-  const jwt = req.signedCookies[EnvVars.CookieProps.Key];
-  if (!jwt) {
-    res.redirect('/');
-  } else {
-    res.sendFile('users.html', {root: viewsDir});
-  }
+app.get('/users', (_: Request, res: Response) => {
+  return res.sendFile('users.html', { root: viewsDir });
 });
 
 
