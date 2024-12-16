@@ -5,17 +5,21 @@ This project was created with [express-generator-typescript](https://github.com/
 
 ## Available Scripts
 
-### `npm run dev` or `npm run dev:hot` (hot reloading)
+### `npm run dev`
 
 Run the server in development mode.
 
-### `npm test` or `npm run test:hot` (hot reloading)
+### `npm test`
 
-Run all unit-tests.
+Run all unit-tests with hot-reloading.
 
-### `npm test -- "name of test file" (i.e. Users).`
+### `npm test -- --testFile="name of test file" (i.e. --testFile=Users).`
 
 Run a single unit-test.
+
+### `npm run test:no-reloading`
+
+Run all unit-tests without hot-reloading.
 
 ### `npm run lint`
 
@@ -28,6 +32,10 @@ Build the project for production.
 ### `npm start`
 
 Run the production build (Must be built first).
+
+### `npm start -- --env="name of env file" (default is production).`
+
+Run production build with a different env file.
 
 
 ## Additional Notes

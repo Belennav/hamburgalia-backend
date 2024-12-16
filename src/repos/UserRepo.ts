@@ -2,6 +2,7 @@ import { IUser } from "@src/models/User";
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
 import { UserModel } from "./Mongoose";
+
 // **** Functions **** //
 
 /**

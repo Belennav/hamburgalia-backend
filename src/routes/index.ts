@@ -1,42 +1,62 @@
-import { Router } from 'express';
+import { Router } from "express";
+import jetValidator from "jet-validator";
 
-import Paths from '@src/common/Paths';
-
-import adminMw from './middleware/adminMw';
-import AuthRoutes from './AuthRoutes';
-import UserRoutes from './UserRoutes';
-
+import User from "@src/models/User";
+import Paths from "../common/Paths";
+import HamburguesaRoutes from "./HamburguesaRoutes";
+import UserRoutes from "./UserRoutes";
 
 // **** Variables **** //
 
-const apiRouter = Router();
+const apiRouter = Router(),
+  validate = jetValidator();
 
-
-// **** AuthRouter **** //
-
-const authRouter = Router();
-
-// Routes
-authRouter.post(Paths.Auth.Login, AuthRoutes.login);
-authRouter.get(Paths.Auth.Logout, AuthRoutes.logout);
-
-// Add AuthRouter
-apiRouter.use(Paths.Auth.Base, authRouter);
-
-
-// **** UserRouter **** //
+// ** Add UserRouter ** //
 
 const userRouter = Router();
+const HamburguesaRouter = Router();
 
-// User Routes
+// Get all users
 userRouter.get(Paths.Users.Get, UserRoutes.getAll);
-userRouter.post(Paths.Users.Add, UserRoutes.add);
-userRouter.put(Paths.Users.Update, UserRoutes.update);
+
+HamburguesaRouter.get(Paths.Hamburguesas.Get, HamburguesaRoutes.getAll);
+userRouter.post(
+  Paths.Users.Login,
+  validate(["user", () => true]),
+  UserRoutes.login
+);
+// Add one user
+userRouter.post(
+  Paths.Users.Add,
+  validate(["user", User.isUser]),
+  UserRoutes.add
+);
+
+HamburguesaRouter.post(Paths.Hamburguesas.Add, HamburguesaRoutes.add);
+
+// Update one user
+userRouter.put(
+  Paths.Users.Update,
+  validate(["user", User.isUser]),
+  UserRoutes.update
+);
+
+HamburguesaRouter.put(Paths.Hamburguesas.Update, HamburguesaRoutes.update);
+
+// Delete one user
 userRouter.delete(Paths.Users.Delete, UserRoutes.delete);
 
-// Add UserRouter
-apiRouter.use(Paths.Users.Base, adminMw, userRouter);
+HamburguesaRouter.delete(Paths.Hamburguesas.Delete, HamburguesaRoutes.delete);
 
+HamburguesaRouter.get(
+  Paths.Hamburguesas.GetAllByCreatorId,
+  validate(["creatorId", "string", "params"]),
+  HamburguesaRoutes.getAllByCreatorId
+);
+
+// Add UserRouter
+apiRouter.use(Paths.Users.Base, userRouter);
+apiRouter.use(Paths.Hamburguesas.Base, HamburguesaRouter);
 
 // **** Export default **** //
 

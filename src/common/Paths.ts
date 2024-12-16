@@ -2,7 +2,6 @@
  * Express router paths go here.
  */
 
-
 export default {
   Base: "/api",
   Users: {
@@ -14,7 +13,7 @@ export default {
     Delete: "/:id",
   },
   Hamburguesas: {
-    Base: "/hamburguesas",
+    Base: "/Hamburguesas",
     Get: "/",
     Add: "/",
     Update: "/",

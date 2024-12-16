@@ -72,16 +72,12 @@
     },
     "useUnknownInCatchVariables": false
   },
-  "ts-node": {
-    "require": ["tsconfig-paths/register", "./preload.js"]
-  },
   "include": [
     "src/**/*.ts",
     "spec/**/*.ts",
-    "scripts",
-    "preload.js"
+    "build.ts"
   ],
   "exclude": [
-    "src/public/*"
+    "src/public/"
   ]
 }

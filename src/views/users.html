@@ -55,12 +55,6 @@
         >
           Add
         </button>
-        <button
-          id="logout-btn"
-          class="btn btn-secondary"
-        >
-          Logout
-        </button>
       </div>
     </div>
 
@@ -78,11 +72,9 @@
         {{#each users}}
           <div class="user-display-ele">
             <div class="normal-view">
-              <div class="display-wrapper">
-                <div><b>Name:</b> {{name}}</div>
-                <div><b>Email:</b> {{email}}</div>
-                <div><b>Created:</b> {{createdFormatted}}</div>
-              </div>
+              <div><b>Name:</b> {{name}}</div>
+              <div><b>Email:</b> {{email}}</div>
+              <div><b>Created:</b> {{createdFormatted}}</div>
               <button
                 type="button"
                 class="btn btn-primary edit-user-btn"

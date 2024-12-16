@@ -1,4 +1,8 @@
-/* eslint-disable n/no-process-env */
+/**
+ * Environments variables declared here.
+ */
+
+/* eslint-disable node/no-process-env */
 
 
 export default {

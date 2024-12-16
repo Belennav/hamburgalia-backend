@@ -22,6 +22,11 @@ body .add-user-col input {
   margin-bottom: 10px;
 }
 
+body .add-user-col #add-user-btn {
+  margin-top: 2px;
+  margin-bottom: 10px;
+}
+
 
 /** Users Display Column **/
 

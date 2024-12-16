@@ -13,7 +13,7 @@ const userSchema: Schema = new mongoose.Schema(
   { collection: "User" }
 );
 
-const sangucheSchema: Schema = new mongoose.Schema(
+const HamburguesaSchema: Schema = new mongoose.Schema(
   {
     nombre: { type: String, required: false },
     ingredientes: { type: Array<Ingrediente>, required: false },
@@ -26,5 +26,5 @@ const db: Connection = mongoose.createConnection(
   "mongodb://127.0.0.1:27017/Salardich"
 );
 
-export const SangucheModel = db.model<IHamburguesa>("Hamburguesa", sangucheSchema);
+export const HamburguesaModel = db.model<IHamburguesa>("Hamburguesa", HamburguesaSchema);
 export const UserModel = db.model<IUser>("User", userSchema);
