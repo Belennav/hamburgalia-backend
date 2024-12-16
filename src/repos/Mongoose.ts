@@ -23,7 +23,7 @@ const HamburguesaSchema: Schema = new mongoose.Schema(
 );
 
 const db: Connection = mongoose.createConnection(
-  "mongodb://127.0.0.1:27017/Salardich"
+  "mongodb://127.0.0.1:27017/Hamburgalia"
 );
 
 export const HamburguesaModel = db.model<IHamburguesa>("Hamburguesa", HamburguesaSchema);
