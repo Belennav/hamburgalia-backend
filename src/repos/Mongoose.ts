@@ -1,4 +1,4 @@
-import { IHamburguesa, Ingrediente } from "@src/models/Hamburguesa";
+import { IHamburguesa, Ingrediente } from "@src/models/Hamburguesas";
 import { IUser } from "@src/models/User";
 import mongoose, { Connection, Schema } from "mongoose";
 
@@ -13,7 +13,7 @@ const userSchema: Schema = new mongoose.Schema(
   { collection: "User" }
 );
 
-const HamburguesaSchema: Schema = new mongoose.Schema(
+const hamburguesaSchema: Schema = new mongoose.Schema(
   {
     nombre: { type: String, required: false },
     ingredientes: { type: Array<Ingrediente>, required: false },
@@ -23,8 +23,8 @@ const HamburguesaSchema: Schema = new mongoose.Schema(
 );
 
 const db: Connection = mongoose.createConnection(
-  "mongodb://127.0.0.1:27017/Hamburgalia"
+  "mongodb://127.0.0.1:27017/Salardich"
 );
 
-export const HamburguesaModel = db.model<IHamburguesa>("Hamburguesa", HamburguesaSchema);
+export const HamburguesaModel = db.model<IHamburguesa>("Hamburguesa", hamburguesaSchema);
 export const UserModel = db.model<IUser>("User", userSchema);

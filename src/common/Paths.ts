@@ -2,6 +2,8 @@
  * Express router paths go here.
  */
 
+import Hamburguesas from "@src/models/Hamburguesas";
+
 export default {
   Base: "/api",
   Users: {
@@ -13,7 +15,7 @@ export default {
     Delete: "/:id",
   },
   Hamburguesas: {
-    Base: "/Hamburguesas",
+    Base: "/hamburguesa",
     Get: "/",
     Add: "/",
     Update: "/",

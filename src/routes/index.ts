@@ -14,12 +14,12 @@ const apiRouter = Router(),
 // ** Add UserRouter ** //
 
 const userRouter = Router();
-const HamburguesaRouter = Router();
+const hamburguesaRouter = Router();
 
 // Get all users
 userRouter.get(Paths.Users.Get, UserRoutes.getAll);
 
-HamburguesaRouter.get(Paths.Hamburguesas.Get, HamburguesaRoutes.getAll);
+hamburguesaRouter.get(Paths.Hamburguesas.Get, HamburguesaRoutes.getAll);
 userRouter.post(
   Paths.Users.Login,
   validate(["user", () => true]),
@@ -32,7 +32,7 @@ userRouter.post(
   UserRoutes.add
 );
 
-HamburguesaRouter.post(Paths.Hamburguesas.Add, HamburguesaRoutes.add);
+hamburguesaRouter.post(Paths.Hamburguesas.Add, HamburguesaRoutes.add);
 
 // Update one user
 userRouter.put(
@@ -41,14 +41,14 @@ userRouter.put(
   UserRoutes.update
 );
 
-HamburguesaRouter.put(Paths.Hamburguesas.Update, HamburguesaRoutes.update);
+hamburguesaRouter.put(Paths.Hamburguesas.Update, HamburguesaRoutes.update);
 
 // Delete one user
 userRouter.delete(Paths.Users.Delete, UserRoutes.delete);
 
-HamburguesaRouter.delete(Paths.Hamburguesas.Delete, HamburguesaRoutes.delete);
+hamburguesaRouter.delete(Paths.Hamburguesas.Delete, HamburguesaRoutes.delete);
 
-HamburguesaRouter.get(
+hamburguesaRouter.get(
   Paths.Hamburguesas.GetAllByCreatorId,
   validate(["creatorId", "string", "params"]),
   HamburguesaRoutes.getAllByCreatorId
@@ -56,7 +56,7 @@ HamburguesaRouter.get(
 
 // Add UserRouter
 apiRouter.use(Paths.Users.Base, userRouter);
-apiRouter.use(Paths.Hamburguesas.Base, HamburguesaRouter);
+apiRouter.use(Paths.Hamburguesas.Base, hamburguesaRouter);
 
 // **** Export default **** //
 
