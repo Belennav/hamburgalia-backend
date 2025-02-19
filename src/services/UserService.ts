@@ -27,12 +27,14 @@ function addOne(user: IUser): Promise<void> {
   return UserRepo.add(user);
 }
 
-async function login(user: IUser): Promise<string> {
+async function login(
+  user: IUser
+): Promise<{ token: string; id: string } | null> {
   return await UserRepo.login(user).then((ok) => {
     if (ok == "") {
-      return "";
+      return null;
     }
-    return generateAccessToken(ok);
+    return { token: generateAccessToken(ok), id: ok };
   });
 }
 

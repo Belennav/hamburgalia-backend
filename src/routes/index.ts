@@ -19,6 +19,10 @@ const hamburguesaRouter = Router();
 // Get all users
 userRouter.get(Paths.Users.Get, UserRoutes.getAll);
 
+hamburguesaRouter.get(
+  Paths.Hamburguesas.PageAmount,
+  HamburguesaRoutes.pageAmount
+);
 hamburguesaRouter.get(Paths.Hamburguesas.Get, HamburguesaRoutes.getAll);
 userRouter.post(
   Paths.Users.Login,
@@ -40,6 +44,8 @@ userRouter.put(
   validate(["user", User.isUser]),
   UserRoutes.update
 );
+
+hamburguesaRouter.put(Paths.Hamburguesas.Like, HamburguesaRoutes.like);
 
 hamburguesaRouter.put(Paths.Hamburguesas.Update, HamburguesaRoutes.update);
 

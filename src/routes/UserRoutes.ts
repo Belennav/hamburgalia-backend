@@ -17,8 +17,14 @@ async function getAll(_: IReq, res: IRes) {
 
 async function login(req: IReq<{ user: IUser }>, res: IRes) {
   const { user } = req.body;
-  const token = await UserService.login(user);
-  return res.status(HttpStatusCodes.OK).json({ token });
+  if (!user.username || !user.password) {
+    return res.status(HttpStatusCodes.BAD_REQUEST).end;
+  }
+  const resp = await UserService.login(user);
+  if (!resp) {
+    return res.status(HttpStatusCodes.UNAUTHORIZED).end();
+  }
+  return res.status(HttpStatusCodes.OK).json({ ...resp });
 }
 
 /**
@@ -26,6 +32,9 @@ async function login(req: IReq<{ user: IUser }>, res: IRes) {
  */
 async function add(req: IReq<{ user: IUser }>, res: IRes) {
   const { user } = req.body;
+  if (!user.username || !user.password) {
+    return res.status(HttpStatusCodes.BAD_REQUEST).end();
+  }
   await UserService.addOne(user);
   return res.status(HttpStatusCodes.CREATED).end();
 }

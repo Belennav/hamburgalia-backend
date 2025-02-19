@@ -1,14 +1,16 @@
-import { IHamburguesa } from "@src/models/Hamburguesas";
+import { IHamburguesa } from "@src/models/Hamburguesa";
 import UserService from "@src/services/UserService";
 import mongoose from "mongoose";
-import { HamburguesaModel} from "./Mongoose";
+import { SangucheModel as HamburguesaModel } from "./Mongoose";
 import UserRepo from "./UserRepo";
 // **** Functions **** //
 
 /**
- * Get one hamburguesa.
+ * Get one sanguche.
  */
-async function getOne(_id: mongoose.Types.ObjectId): Promise<IHamburguesa | null> {
+async function getOne(
+  _id: mongoose.Types.ObjectId
+): Promise<IHamburguesa | null> {
   return new Promise<IHamburguesa | null>((resolve, reject) => {
     HamburguesaModel.findOne({ _id: _id })
       .then((hamburguesa: any) => {
@@ -23,7 +25,7 @@ async function getOne(_id: mongoose.Types.ObjectId): Promise<IHamburguesa | null
 }
 
 /**
- * See if a hamburguesa with the given id exists.
+ * See if a sanguche with the given id exists.
  */
 async function persists(_id: mongoose.Types.ObjectId): Promise<boolean> {
   return new Promise<boolean>((resolve, reject) => {
@@ -74,8 +76,8 @@ async function getAllByCreatorId(
 ): Promise<IHamburguesa[]> {
   return new Promise<IHamburguesa[]>((resolve, reject) => {
     HamburguesaModel.find({ creatorId: creatorId })
-      .then((hamburguesas: any) => {
-        resolve(hamburguesas);
+      .then((hamburguesa: any) => {
+        resolve(hamburguesa);
       })
       .catch((err: any) => {
         if (err) {
@@ -86,11 +88,17 @@ async function getAllByCreatorId(
 }
 
 /**
- * Get all hamburguesas.
+ * Get all sanguches.
  */
-async function getAll(): Promise<IHamburguesa[]> {
+async function get(skip: number): Promise<IHamburguesa[]> {
   return new Promise<IHamburguesa[]>((resolve, reject) => {
     HamburguesaModel.find({})
+      .sort(
+        // sort by number of likes
+        { likedBy: -1 }
+      )
+      .limit(6)
+      .skip(skip)
       .then((hamburguesas: any) => {
         resolve(hamburguesas);
       })
@@ -103,9 +111,16 @@ async function getAll(): Promise<IHamburguesa[]> {
 }
 
 /**
- * Add one hamburguesa.
+ * Add one sanguche.
  */
-async function add(hamburguesa: IHamburguesa, token: string): Promise<string> {
+async function add(input: IHamburguesa, token: string): Promise<string> {
+  const hamburguesa = {
+    nombre: input.nombre,
+    ingredientes: input.ingredientes,
+    likedBy: [],
+    creatorId: new mongoose.Types.ObjectId(),
+  };
+
   const userId = UserService.verifyToken(token);
   if (!userId) {
     return "Invalid token";
@@ -113,7 +128,7 @@ async function add(hamburguesa: IHamburguesa, token: string): Promise<string> {
   return checkNameAndIngredientesUnique(hamburguesa)
     .then((res) => {
       if (!res) {
-        return "Hamburguesa ya existe";
+        return "hamburguesa ya existe";
       }
 
       hamburguesa.creatorId = new mongoose.Types.ObjectId(userId);
@@ -135,42 +150,45 @@ async function add(hamburguesa: IHamburguesa, token: string): Promise<string> {
 }
 
 /**
- * Update a hamburguesa.
+ * Update a sanguche.
  */
-async function update(newHamburguesa: IHamburguesa, token: string): Promise<string> {
+async function update(
+  newSanguche: IHamburguesa,
+  token: string
+): Promise<string> {
   const userId = UserService.verifyToken(token);
   if (!userId) {
     return "Token Invalido";
   }
 
-  if (!newHamburguesa._id) {
-    return "Falta el id de la hamburguesa";
+  if (!newSanguche._id) {
+    return "Falta el id del sanguche";
   }
 
-  // get the hamburguesa
-  const hamburguesa = await getOne(newHamburguesa._id);
-  if (!hamburguesa) {
-    return "hamburguesa no encontrado";
+  // get the sanguche
+  const sanguche = await getOne(newSanguche._id);
+  if (!sanguche) {
+    return "Sanguche no encontrado";
   }
 
   // check if the user is the creator
-  if (hamburguesa.creatorId.toString() !== userId) {
+  if (sanguche.creatorId.toString() !== userId) {
     // check if the user is admin
     const isAdmin = await UserRepo.checkIfAdmin(
       new mongoose.Types.ObjectId(userId)
     );
     if (!isAdmin) {
-      return "No tenes permisos para modificar este hamburguesa";
+      return "No tenes permisos para modificar este sanguche";
     }
   }
 
   // check if the name or the ingredients are the same
-  const isUnique = await checkNameAndIngredientesUnique(newHamburguesa);
+  const isUnique = await checkNameAndIngredientesUnique(newSanguche);
   if (!isUnique) {
-    return "Ya hay un hamburguesa igual";
+    return "Ya hay un sanguche igual";
   }
 
-  return HamburguesaModel.updateOne({ _id: newHamburguesa._id }, newHamburguesa)
+  return HamburguesaModel.updateOne({ _id: newSanguche._id }, newSanguche)
     .then(() => {
       return "ok";
     })
@@ -180,21 +198,21 @@ async function update(newHamburguesa: IHamburguesa, token: string): Promise<stri
 }
 
 /**
- * Delete one hamburguesa.
+ * Delete one sanguche.
  */
 async function delete_(
   id: mongoose.Types.ObjectId,
   token: string
 ): Promise<void> {
   const userId = UserService.verifyToken(token);
-  // get the hamburguesa
-  const hamburguesa = await getOne(id);
-  if (!hamburguesa) {
-    return Promise.reject("Hamburguesa not found");
+  // get the sanguche
+  const sanguche = await getOne(id);
+  if (!sanguche) {
+    return Promise.reject("Sanguche not found");
   }
 
   // check if the user is the creator
-  if (hamburguesa.creatorId.toString() !== userId) {
+  if (sanguche.creatorId.toString() !== userId) {
     // check if the user is admin
     const isAdmin = await UserRepo.checkIfAdmin(
       new mongoose.Types.ObjectId(userId)
@@ -216,14 +234,62 @@ async function delete_(
   });
 }
 
+async function like(id: mongoose.Types.ObjectId, token: string): Promise<void> {
+  const idstring = UserService.verifyToken(token);
+  if (!idstring) {
+    return Promise.reject("Invalid token");
+  }
+  const userId = new mongoose.Types.ObjectId(idstring);
+
+  const hamburguesa = await getOne(id);
+  if (!hamburguesa) {
+    return Promise.reject("hamburguesa no encontrada");
+  }
+
+  // check if the user has already liked the sanguche
+  if (hamburguesa.likedBy.includes(userId)) {
+    // remove the like
+    return HamburguesaModel.updateOne(
+      { _id: id },
+      { $pull: { likedBy: userId } }
+    ).then(() => {
+      return;
+    });
+  }
+
+  return HamburguesaModel.updateOne(
+    { _id: id },
+    { $addToSet: { likedBy: userId } }
+  ).then(() => {
+    return;
+  });
+}
+
+async function pageAmount() {
+  // get the amount of pages (skip 6) as int
+  return new Promise<number>((resolve, reject) => {
+    HamburguesaModel.countDocuments()
+      .then((amount: number) => {
+        resolve(Math.ceil(amount / 6));
+      })
+      .catch((err: any) => {
+        if (err) {
+          reject(err);
+        }
+      });
+  });
+}
+
 // **** Export default **** //
 
 export default {
   getOne,
   persists,
-  getAll,
+  get: get,
   add,
+  like,
   update,
+  pageAmount,
   delete: delete_,
   getAllByCreatorId,
 } as const;

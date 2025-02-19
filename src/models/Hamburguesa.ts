@@ -1,9 +1,11 @@
 import mongoose from "mongoose";
+
 // **** Variables **** //
 
 const INVALID_CONSTRUCTOR_PARAM =
   "nameOrObj arg must a string or an object " +
   "with the appropriate user keys.";
+
 // **** Types **** //
 
 export interface IHamburguesa {
@@ -11,7 +13,9 @@ export interface IHamburguesa {
   nombre: string;
   ingredientes: Array<Ingrediente>;
   creatorId: mongoose.Types.ObjectId;
+  likedBy: mongoose.Types.ObjectId[];
 }
+
 // **** Functions **** //
 
 /**
@@ -21,19 +25,20 @@ function new_(
   nombre?: string,
   ingredientes?: Array<Ingrediente>,
   _id?: string // id last cause usually set by db
-): IHamburguesa{
+): IHamburguesa {
   return {
     _id: _id ? new mongoose.Types.ObjectId(`${_id}`) : undefined,
     nombre: nombre ?? "",
     ingredientes: ingredientes ? ingredientes : [],
     creatorId: new mongoose.Types.ObjectId(),
+    likedBy: [],
   };
 }
 
 /**
  * Get user instance from object.
  */
-function from(param: object): IHamburguesa{
+function from(param: object): IHamburguesa {
   if (!isHamburguesa(param)) {
     throw new Error(INVALID_CONSTRUCTOR_PARAM);
   }
@@ -59,15 +64,23 @@ function isHamburguesa(arg: unknown): boolean {
     ) &&
     "creatorId" in arg && // creatorId is a mongoose.Types.ObjectId or string
     (typeof (arg as IHamburguesa).creatorId === "string" ||
-      (arg as IHamburguesa).creatorId instanceof mongoose.Types.ObjectId)
+      (arg as IHamburguesa).creatorId instanceof mongoose.Types.ObjectId) &&
+    "likedBy" in arg &&
+    Array.isArray((arg as IHamburguesa).likedBy)
   );
 }
 
 export enum Ingrediente {
-  QUESO = "queso",
-  TOMATE = "tomate",
-  LECHUGA = "lechuga",
-  SALSA = "salsa",
+  JAMON = "Jamon",
+  QUESO = "Queso",
+  TOMATE = "Tomate",
+  LECHUGA = "Lechuga",
+  HUEVO = "Huevo",
+  MAYONESA = "Mayonesa",
+  PANCETA = "Panceta",
+  KETCHUP = "Ketchup",
+  MOSTAZA = "Mostaza",
+  PALTA = "Palta",
 }
 
 // **** Export default **** //
@@ -75,5 +88,5 @@ export enum Ingrediente {
 export default {
   new: new_,
   from,
-  isHamburguesa,
+  isHamburguesa: isHamburguesa,
 } as const;
