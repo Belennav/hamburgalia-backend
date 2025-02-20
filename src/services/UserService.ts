@@ -29,12 +29,16 @@ function addOne(user: IUser): Promise<void> {
 
 async function login(
   user: IUser
-): Promise<{ token: string; id: string } | null> {
+): Promise<{ token: string; id: string; isAdmin: boolean } | null> {
   return await UserRepo.login(user).then((ok) => {
-    if (ok == "") {
+    if (ok.id == "") {
       return null;
     }
-    return { token: generateAccessToken(ok), id: ok };
+    return {
+      token: generateAccessToken(ok.id),
+      id: ok.id,
+      isAdmin: ok.isAdmin,
+    };
   });
 }
 

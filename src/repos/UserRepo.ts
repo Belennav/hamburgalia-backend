@@ -90,19 +90,19 @@ async function add(user: IUser): Promise<void> {
   });
 }
 
-async function login(user: IUser): Promise<string> {
+async function login(user: IUser): Promise<{ id: string; isAdmin: boolean }> {
   // eslint-disable-next-line max-len
   return UserModel.findOne({ email: user.email }).then(
     (foundUser: IUser | null) => {
       if (foundUser) {
         return bcrypt.compare(user.password, foundUser.password).then((ok) => {
           if (!ok) {
-            return "";
+            return { id: "", isAdmin: false };
           }
-          return foundUser._id.toString();
+          return { id: foundUser._id.toString(), isAdmin: foundUser.isAdmin };
         });
       } else {
-        return "";
+        return { id: "", isAdmin: false };
       }
     }
   );
