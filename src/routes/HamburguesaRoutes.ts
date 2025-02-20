@@ -10,7 +10,7 @@ import { IReq, IRes } from "./types/express/misc";
 /**
  * Get all users.
  */
-async function getAll(req: IReq<{ skip: number }>, res: IRes) {
+async function get(req: IReq<{ skip: number }>, res: IRes) {
   const skip = parseInt(req.params.skip) || 0;
   const hamburguesas = await HamburguesaService.get(skip);
   return res.status(HttpStatusCodes.OK).json({ hamburguesas });
@@ -97,7 +97,7 @@ async function like(req: IReq<{ token: string }>, res: IRes) {
 export default {
   pageAmount,
   like,
-  getAll,
+  getAll: get,
   add,
   update,
   getAllByCreatorId,

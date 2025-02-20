@@ -15,10 +15,11 @@ const userSchema: Schema = new mongoose.Schema(
 
 const hamburguesaSchema: Schema = new mongoose.Schema(
   {
-    nombre: { type: String, required: false },
-    ingredientes: { type: Array<Ingrediente>, required: false },
-    creatorId: { type: mongoose.Types.ObjectId, required: false },
+    nombre: { type: String },
+    ingredientes: { type: Array<Ingrediente> },
+    creatorId: { type: mongoose.Types.ObjectId },
     likedBy: { type: Array<mongoose.Types.ObjectId>, required: false },
+    description: { type: String, required: false },
   },
   { collection: "Hamburguesa" }
 );

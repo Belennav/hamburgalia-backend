@@ -119,6 +119,7 @@ async function add(input: IHamburguesa, token: string): Promise<string> {
     ingredientes: input.ingredientes,
     likedBy: [],
     creatorId: new mongoose.Types.ObjectId(),
+    description: input.description,
   };
 
   const userId = UserService.verifyToken(token);

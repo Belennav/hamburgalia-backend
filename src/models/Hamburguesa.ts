@@ -14,6 +14,7 @@ export interface IHamburguesa {
   ingredientes: Array<Ingrediente>;
   creatorId: mongoose.Types.ObjectId;
   likedBy: mongoose.Types.ObjectId[];
+  description: string;
 }
 
 // **** Functions **** //
@@ -32,6 +33,7 @@ function new_(
     ingredientes: ingredientes ? ingredientes : [],
     creatorId: new mongoose.Types.ObjectId(),
     likedBy: [],
+    description: "",
   };
 }
 
