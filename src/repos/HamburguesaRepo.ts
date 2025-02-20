@@ -1,12 +1,11 @@
 import { IHamburguesa } from "@src/models/Hamburguesa";
 import UserService from "@src/services/UserService";
 import mongoose from "mongoose";
-import { SangucheModel as HamburguesaModel } from "./Mongoose";
+import { HamburguesaModel } from "./Mongoose";
 import UserRepo from "./UserRepo";
 // **** Functions **** //
 
 /**
- * Get one sanguche.
  */
 async function getOne(
   _id: mongoose.Types.ObjectId
@@ -25,7 +24,6 @@ async function getOne(
 }
 
 /**
- * See if a sanguche with the given id exists.
  */
 async function persists(_id: mongoose.Types.ObjectId): Promise<boolean> {
   return new Promise<boolean>((resolve, reject) => {
@@ -88,7 +86,6 @@ async function getAllByCreatorId(
 }
 
 /**
- * Get all sanguches.
  */
 async function get(skip: number): Promise<IHamburguesa[]> {
   return new Promise<IHamburguesa[]>((resolve, reject) => {
@@ -111,7 +108,6 @@ async function get(skip: number): Promise<IHamburguesa[]> {
 }
 
 /**
- * Add one sanguche.
  */
 async function add(input: IHamburguesa, token: string): Promise<string> {
   const hamburguesa = {
@@ -151,10 +147,9 @@ async function add(input: IHamburguesa, token: string): Promise<string> {
 }
 
 /**
- * Update a sanguche.
  */
 async function update(
-  newSanguche: IHamburguesa,
+  newHamburguesa: IHamburguesa,
   token: string
 ): Promise<string> {
   const userId = UserService.verifyToken(token);
@@ -162,34 +157,34 @@ async function update(
     return "Token Invalido";
   }
 
-  if (!newSanguche._id) {
-    return "Falta el id del sanguche";
+  if (!newHamburguesa._id) {
+    return "Falta el id de la hamburguesa";
   }
 
-  // get the sanguche
-  const sanguche = await getOne(newSanguche._id);
-  if (!sanguche) {
-    return "Sanguche no encontrado";
+  // get the burger
+  const hamburguesa = await getOne(newHamburguesa._id);
+  if (!hamburguesa) {
+    return "Hamburguesa no encontrada";
   }
 
   // check if the user is the creator
-  if (sanguche.creatorId.toString() !== userId) {
+  if (hamburguesa.creatorId.toString() !== userId) {
     // check if the user is admin
     const isAdmin = await UserRepo.checkIfAdmin(
       new mongoose.Types.ObjectId(userId)
     );
     if (!isAdmin) {
-      return "No tenes permisos para modificar este sanguche";
+      return "No tenes permisos para modificar esta hamburguesa";
     }
   }
 
   // check if the name or the ingredients are the same
-  const isUnique = await checkNameAndIngredientesUnique(newSanguche);
+  const isUnique = await checkNameAndIngredientesUnique(newHamburguesa);
   if (!isUnique) {
-    return "Ya hay un sanguche igual";
+    return "Ya hay una hamburguesa igual";
   }
 
-  return HamburguesaModel.updateOne({ _id: newSanguche._id }, newSanguche)
+  return HamburguesaModel.updateOne({ _id: newHamburguesa._id }, newHamburguesa)
     .then(() => {
       return "ok";
     })
@@ -199,7 +194,6 @@ async function update(
 }
 
 /**
- * Delete one sanguche.
  */
 async function delete_(
   id: mongoose.Types.ObjectId,

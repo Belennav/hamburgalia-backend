@@ -65,7 +65,7 @@ async function update(
         return res.status(HttpStatusCodes.BAD_REQUEST).json({ error: result });
       case "Hamburguesa no encontrada":
         return res.status(HttpStatusCodes.NOT_FOUND).json({ error: result });
-      case "No tenes permisos para modificar este sanguche":
+      case "No tenes permisos para modificar esta hamburguesa":
         return res.status(HttpStatusCodes.FORBIDDEN).json({ error: result });
       case "ok":
         return res.status(HttpStatusCodes.OK).end();
