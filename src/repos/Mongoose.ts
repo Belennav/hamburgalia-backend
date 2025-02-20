@@ -28,7 +28,7 @@ const db: Connection = mongoose.createConnection(
   "mongodb://127.0.0.1:27017/Hamburgalia"
 );
 
-export const SangucheModel = db.model<IHamburguesa>(
+export const HamburguesaModel = db.model<IHamburguesa>(
   "Hamburguesa",
   hamburguesaSchema
 );
